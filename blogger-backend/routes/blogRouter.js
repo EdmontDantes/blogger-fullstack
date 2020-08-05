@@ -65,6 +65,45 @@ router.put('/update-blog/:blogId', async (req, res) => {
   } catch {
     return res.status(500).json({confirmation: 'failed', message: 'Sorry Something is wrong contact the developer, error code PUT.Async.Catch'})
   }
+});
+
+
+router.delete('/remove/:blogId', async (req, res) => {
+  try {
+    const { blogId } = req.params;
+    await Blog.findByIdAndRemove({ _id: blogId })
+    await Blog.findById({ _id: blogId }).then((didItFindBlog) => {
+      if(didItFindBlog) {
+        return res.status(500).json({ confirmation: 'failed', message: 'Sorry we still found your blog in DB please verify that you inputted correct id to remove'});
+      } else {
+        return res.status(200).json({ confirmation: 'Success', message: 'Success your requested blog entry by id was removed'})
+      }
+    }).catch((err) => {
+      return res.status(500).json({confirmation: 'failed', message: 'Sorry Something is wrong contact the developer, error code Post.findById.Catch', error: err})
+    });
+
+    
+  } catch {
+    return res.status(500).json({confirmation: 'failed', message: 'Sorry Something is wrong contact the developer, error code DELETE.Async.Catch'})
+  }
+});
+
+
+router.get('/:blogId', async (req, res) => {
+  try {
+    const { blogId } = req.params;
+    await Blog.findById({ _id: blogId }).then((didItFindBlog) => {
+      if(didItFindBlog) {
+        return res.status(200).json({ confirmation: 'Success', requestedBlogEntry: didItFindBlog })
+      } else {
+        return res.status(500).json({ confirmation: 'failed', message: 'Sorry we didn\'t find your blog in DB please verify that you inputted correct id'});
+      }
+    }).catch((err) => {
+      return res.status(500).json({confirmation: 'failed', message: 'Sorry Something is wrong contact the developer, error code Post.findById.Catch', error: err})
+    });
+  } catch {
+    return res.status(500).json({confirmation: 'failed', message: 'Sorry Something is wrong contact the developer, error code GetID.Async.Catch'})
+  }
 })
 module.exports = router;
 
